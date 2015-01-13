@@ -286,8 +286,6 @@ if [[ ! -d /etc/nginx/custom-sites ]]; then
 	mkdir /etc/nginx/custom-sites/
 fi
 rsync -rvzh --delete /srv/config/nginx-config/sites/ /etc/nginx/custom-sites/
-echo "Creating /etc/nginx/custom-sites/default.conf using sed"
-sed "s/local.wordpress.dev/www.$HOSTNAME.local/" /srv/config/nginx-config/sites/default.conf > /etc/nginx/custom-sites/default.conf
 
 echo " * /srv/config/nginx-config/nginx.conf           -> /etc/nginx/nginx.conf"
 echo " * /srv/config/nginx-config/nginx-wp-common.conf -> /etc/nginx/nginx-wp-common.conf"
