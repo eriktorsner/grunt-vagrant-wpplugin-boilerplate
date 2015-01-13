@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+# Start with a bash array containing all packages we want to install in the
+# virtual machine. We'll then loop through each of these and check individual
+# status before adding them to the apt_package_install_list array.
+apt_package_install_list=()
+apt_package_check_list=(
+
+	# PHP5
+	#
+	# Our base packages for php5. As long as php5-fpm and php5-cli are
+	# installed, there is no need to install the general php5 package, which
+	# can sometimes install apache as a requirement.
+	php5-fpm
+	php5-cli
+
+	# Common and dev packages for php
+	php5-common
+	php5-dev
+
+	# Extra PHP modules that we find useful
+	php5-memcache
+	php5-imagick
+	php5-mcrypt
+	php5-mysql
+	php5-curl
+	php-pear
+	php5-gd
+
+	#needed for phpbrew
+	autoconf
+	automake
+	build-essential
+	libxslt1-dev
+	re2c
+	libxml2
+	libxml2-dev
+	bison
+	libbz2-dev
+	libreadline-dev
+	libfreetype6
+	libfreetype6-dev
+	libpng12-0
+	libpng12-dev
+	libjpeg-dev
+	libjpeg8-dev
+	libjpeg8 
+	libgd-dev
+	libgd3
+	libxpm4
+	libltdl7
+	libltdl-dev	
+	libssl-dev
+	openssl
+	libgettextpo-dev
+	libgettextpo0
+	libicu-dev
+	libmhash-dev
+	libmhash2
+	libmcrypt-dev
+	libmcrypt4
+
+	# nginx is installed as the default web server
+	nginx
+
+	# memcached is made available for object caching
+	memcached
+
+	# mysql is the default database
+	mysql-server
+
+	# other packages that come in handy
+	imagemagick
+	git-core
+	subversion
+	zip
+	unzip
+	ngrep
+	curl
+	make
+	vim
+	colordiff
+
+
+	# Req'd for i18n tools
+	gettext
+
+	# Req'd for Webgrind
+	graphviz
+
+	# dos2unix
+	# Allows conversion of DOS style line endings to something we'll have less
+	# trouble with in Linux.
+	dos2unix
+
+	# nodejs for use by grunt
+	g++
+	nodejs
+)
+
+echo "Check for apt packages to install..."
+
+# Loop through each of our packages that should be installed on the system. If
+# not yet installed, it should be added to the array of packages to install.
+for pkg in "${apt_package_check_list[@]}"; do
+	package_version="$(dpkg -s $pkg 2>&1 | grep 'Version:' | cut -d " " -f 2)"
+	if [[ -n "${package_version}" ]]; then
+		space_count="$(expr 20 - "${#pkg}")" #11
+		pack_space_count="$(expr 30 - "${#package_version}")"
+		real_space="$(expr ${space_count} + ${pack_space_count} + ${#package_version})"
+		printf " * $pkg %${real_space}.${#package_version}s ${package_version}\n"
+	else
+		echo " *" $pkg [not installed]
+		apt_package_install_list+=($pkg)
+	fi
+done
